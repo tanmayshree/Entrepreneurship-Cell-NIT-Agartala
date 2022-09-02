@@ -12,4 +12,5 @@ class UserValidationApi(Resource):
 
       @auth_required('token')
       def get(self):
+            print(5)
             return make_response(json.dumps("Validated successfully."),200)

@@ -26,6 +26,7 @@ create_user_details_parser.add_argument('name')
 create_user_details_parser.add_argument('mobile_no')
 create_user_details_parser.add_argument('pass_year')
 create_user_details_parser.add_argument('user_email')
+create_user_details_parser.add_argument('organisation')
 
 class UserApi(Resource):
     @auth_required('token')
@@ -49,10 +50,12 @@ class UserApi(Resource):
         mobile_no = parser.get('mobile_no',None)
         pass_year = parser.get('pass_year',None)
         email = parser.get('user_email', None)
+        organisation = parser.get('organisation', None)
         # user = User.query.filter_by(email = email).first()
-        user_detail = UserDetails(name=name, mobile_no=mobile_no,pass_year=pass_year,user_email=email)
+        user_detail = UserDetails(name=name, mobile_no=mobile_no,pass_year=pass_year,user_email=email, organisation= organisation)
         db.session.add(user_detail)
         db.session.commit()
+        print(name,mobile_no,pass_year,email)
         return make_response(json.dumps("Details added successfully."),200)
 
     @auth_required('token')

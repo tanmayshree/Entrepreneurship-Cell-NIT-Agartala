@@ -1,4 +1,5 @@
 from api.testimonial_api import *
+from api.admin_api import *
 from api.user_api import *
 from flask import Flask, render_template, redirect
 from api.user_validation_api import UserValidationApi
@@ -26,11 +27,12 @@ app,api = create_app()
 def home():
     return render_template("index.html")
 
-api.add_resource(UserApi,"/api/user/get/<string:email>","/api/add_feedback","/api/user/delete/<string:email>")
+api.add_resource(UserApi,"/api/user/get/<string:email>","/api/add_feedback","/api/user/delete/<string:email>","/api/register/user_details")
 
-api.add_resource(TestimonialApi,"/api/add_user_feedback")
+api.add_resource(TestimonialApi,"/api/add_user_feedback","/api/get/user_dashboard/<string:email>")
 
-api.add_resource(UserValidationApi, "/api/user-validation")
+api.add_resource(UserValidationApi, "/api/user_validation")
+api.add_resource(AdminApi, "/api/admin/getPendingTestimonials")
 
 # @app.route("/view/<int:id>")
 # def view(id):

@@ -6,6 +6,9 @@ from application.model import Testimonial
 from database.database_config import db
 from flask_security import auth_required, login_required
 from flask_login import current_user
+from datetime import datetime
+
+from jwt_tokens.setup import token_required
 
 # testimonial_api_resource_field_get = {
 #       'id' : fields.Integer,
@@ -15,7 +18,6 @@ from flask_login import current_user
 
 create_testimonial_details_parser = reqparse.RequestParser()
 create_testimonial_details_parser.add_argument('feedback');
-create_testimonial_details_parser.add_argument('validation_status');
 create_testimonial_details_parser.add_argument('user_email');
 
 class Error(HTTPException):
@@ -27,20 +29,19 @@ class Error(HTTPException):
         self.response = make_response(json.dumps(message), status_code, {"Content-Type":"application/json"})
 
 class TestimonialApi(Resource):
-    @auth_required('token')
-    def post(self):
-        # print(current_user.email)
+    @token_required
+    def post(self,user,current_user):
         parser = create_testimonial_details_parser.parse_args()
         feedback = parser.get('feedback', None)
-        user_detail = Testimonial(feedback = feedback, validation_status = False, user_email = current_user.email)
+        timestamp = str(datetime.now())[0:19]
+        user_detail = Testimonial(feedback = feedback, validation_status = 0, user_email = user.email, timestamp = timestamp)
         db.session.add(user_detail)
         db.session.commit()
         return make_response(json.dumps("Feedback submitted successfully."),200)
     
-    # @auth_required('token')
-    # @marshal_with(testimonial_api_resource_field_get)
-    def get(self,email):
-        testimonial = Testimonial.query.filter_by(user_email = email).all()
+    @token_required
+    def get(self,user,current_user):
+        testimonial = Testimonial.query.filter_by(user_email = user.email).all()
         if(testimonial == None):
             raise Error(404, "Testimonial doesn't exists.", "UDE")
         else:
@@ -49,6 +50,13 @@ class TestimonialApi(Resource):
                 data = {
                     "feedback" : i.feedback,
                     "validation_status" : i.validation_status,
+                    "timestamp" : i.timestamp
                 }
+                if data["validation_status"]==0:
+                    data["validation_status"]="Pending"
+                elif data["validation_status"]==1:
+                    data["validation_status"]="Accepted"
+                elif data["validation_status"]==2:
+                    data["validation_status"]="Rejected"
                 testimonial_list.append(data)
             return make_response(json.dumps(testimonial_list),200)

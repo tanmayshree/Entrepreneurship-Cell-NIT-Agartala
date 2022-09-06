@@ -42,6 +42,7 @@ class Role(db.Model, RoleMixin):
 class Testimonial(db.Model):
     __tablename__ = 'testimonial'
     id = db.Column(db.Integer, primary_key= True, autoincrement = True)
+    timestamp = db.Column(db.String)
     feedback = db.Column(db.String, nullable = False)
     validation_status = db.Column(db.Integer, nullable = False, default = 0) # 0:Pending, 1:Accepted, 2:Rejected
     user_email = db.Column(db.Integer, db.ForeignKey('user.email'), nullable=False)

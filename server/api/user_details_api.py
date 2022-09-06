@@ -6,6 +6,8 @@ from application.model import User, UserDetails
 from database.database_config import db
 from flask_security import auth_required, login_required
 
+from jwt_tokens.setup import token_required
+
 user_api_resource_field_get = {
     'id' : fields.Integer,
     'email' :fields.String,
@@ -29,22 +31,22 @@ create_user_details_parser.add_argument('user_email')
 create_user_details_parser.add_argument('organisation')
 
 class UserApi(Resource):
-    @auth_required('token')
-    @marshal_with(user_api_resource_field_get)
-    def get(self,email):
-        user = User.query.filter_by(email = email).first()
-        if(user == None):
-            raise Error(404, "Account doesn't exists.", "UDE")
-        else:
-            data = {
-                'email' : user.email,
-                'name' : user.user_detail[0].name,
-                'mobile_no' : user.user_detail[0].mobile_no
-            }
-            return data
+    # @auth_required('token')
+    # @marshal_with(user_api_resource_field_get)
+    # def get(self,email):
+    #     user = User.query.filter_by(email = email).first()
+    #     if(user == None):
+    #         raise Error(404, "Account doesn't exists.", "UDE")
+    #     else:
+    #         data = {
+    #             'email' : user.email,
+    #             'name' : user.user_detail[0].name,
+    #             'mobile_no' : user.user_detail[0].mobile_no
+    #         }
+    #         return data
     
-    @auth_required('token')
-    def post(self):
+    @token_required
+    def post(self,user,current_user):
         parser = create_user_details_parser.parse_args()
         name = parser.get('name',None)
         mobile_no = parser.get('mobile_no',None)
@@ -52,15 +54,15 @@ class UserApi(Resource):
         email = parser.get('user_email', None)
         organisation = parser.get('organisation', None)
         # user = User.query.filter_by(email = email).first()
-        user_detail = UserDetails(name=name, mobile_no=mobile_no,pass_year=pass_year,user_email=email, organisation= organisation)
+        user_detail = UserDetails(name=name, mobile_no=mobile_no,pass_year=pass_year,user_email=user.email, organisation= organisation)
         db.session.add(user_detail)
         db.session.commit()
-        print(name,mobile_no,pass_year,email)
+        # print(name,mobile_no,pass_year,email)
         return make_response(json.dumps("Details added successfully."),200)
 
-    @auth_required('token')
-    def delete(self, email):  # TO DELETE DATA
-        user = User.query.filter_by(email = email).first()
+    @token_required
+    def delete(self, user,current_user):  # TO DELETE DATA
+        user = User.query.filter_by(email = user.email).first()
         if(user == None):
             raise Error(404, "Account doesn't exists.", "UDE")
         else:

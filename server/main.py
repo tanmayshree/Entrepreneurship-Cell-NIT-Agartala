@@ -56,7 +56,7 @@ api.add_resource(Login, "/api/login")
 
 
 # if __name__ == "__main__":
-#     app.run(debug = True)
+#     app.run()
 
 
     

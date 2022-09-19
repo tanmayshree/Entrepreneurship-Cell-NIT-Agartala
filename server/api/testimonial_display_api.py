@@ -4,9 +4,6 @@ from flask import make_response
 from application.model import Testimonial
 from datetime import datetime
 
-
-
-
 class DisplayTestimonialsApi(Resource):
       def get(self):
             testimonials = Testimonial.query.filter_by(validation_status=1).all()

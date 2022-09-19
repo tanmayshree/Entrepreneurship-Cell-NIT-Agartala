@@ -29,7 +29,7 @@ class Error(HTTPException):
         self.response = make_response(json.dumps(message), status_code, {"Content-Type":"application/json"})
 
 class TestimonialApi(Resource):
-    @token_required
+    @token_required()
     def post(self,user,current_user):
         parser = create_testimonial_details_parser.parse_args()
         feedback = parser.get('feedback', None)
@@ -39,7 +39,7 @@ class TestimonialApi(Resource):
         db.session.commit()
         return make_response(json.dumps("Feedback submitted successfully."),200)
     
-    @token_required
+    @token_required()
     def get(self,user,current_user):
         testimonial = Testimonial.query.filter_by(user_email = user.email).all()
         if(testimonial == None):

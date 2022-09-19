@@ -23,9 +23,10 @@ class Login(Resource):
                         if verify_password(password,user.password):
                               jwt_token = jwt.encode({
                                     'public_id': user.id,
+                                    'role_id' : user.user_detail[0].role_id,
                                     'exp' : datetime.utcnow() + timedelta(minutes = 30)
                                     }, "gibwaeilfvhnikfvhn468468784vr497drv9874v6sdrvdrv")
-                              return jsonify({'jwt_token' : jwt_token})
+                              return jsonify({'jwt_token' : jwt_token, 'role_id' : user.user_detail[0].role_id})
                         else:
                              return make_response(json.dumps("Invalid Password."),400)  
                   else:

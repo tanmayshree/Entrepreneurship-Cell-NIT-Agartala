@@ -1,4 +1,6 @@
+from api.admin_validation_api import AdminValidationApi
 from api.testimonial_display_api import DisplayTestimonialsApi
+from api.testimonial_verification_api import VerifyTestimonialsApi
 from api.user_testimonial_api import *
 from api.admin_api import *
 from api.user_details_api import *
@@ -39,7 +41,9 @@ api.add_resource(TestimonialApi,"/api/addUserTestimonial","/api/get/userDashboar
 
 api.add_resource(DisplayTestimonialsApi, "/api/getApprovedTestimonials")
 api.add_resource(UserValidationApi, "/api/userValidation")
-api.add_resource(AdminApi, "/api/admin/getPendingTestimonials")
+api.add_resource(AdminValidationApi, "/api/adminValidation")
+# api.add_resource(AdminApi,"/api/modifySecondaryAdmin")
+api.add_resource(VerifyTestimonialsApi, "/api/admin/getPendingTestimonials", "/api/updateTestimonialValidationStatus")
 api.add_resource(Login, "/api/login")
 # @app.route("/view/<int:id>")
 # def view(id):

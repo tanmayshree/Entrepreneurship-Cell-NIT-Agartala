@@ -45,7 +45,7 @@ class UserApi(Resource):
     #         }
     #         return data
     
-    @token_required
+    @token_required()
     def post(self,user,current_user):
         parser = create_user_details_parser.parse_args()
         name = parser.get('name',None)
@@ -60,7 +60,7 @@ class UserApi(Resource):
         # print(name,mobile_no,pass_year,email)
         return make_response(json.dumps("Details added successfully."),200)
 
-    @token_required
+    @token_required()
     def delete(self, user,current_user):  # TO DELETE DATA
         user = User.query.filter_by(email = user.email).first()
         if(user == None):

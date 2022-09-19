@@ -8,8 +8,8 @@ from flask_security import auth_required, login_required
 from jwt_tokens.setup import token_required
 
 
-class UserValidationApi(Resource):
+class AdminValidationApi(Resource):
 
-      @token_required()
+      @token_required(role=[0,1])
       def get(self,user,current_user):
             return make_response(json.dumps("Validated successfully."),200)

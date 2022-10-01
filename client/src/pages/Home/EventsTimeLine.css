@@ -1,0 +1,9 @@
+.upcoming-events-page{
+    margin: 35px auto;
+}
+
+.upcoming-events-page p{
+    font-size: 150%;
+    color: rgb(255, 193, 193);
+    /* background: rgba(255, 255, 255, 0.089); */
+}

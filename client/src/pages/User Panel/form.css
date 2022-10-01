@@ -1,0 +1,57 @@
+.form_page_wrapper{
+      /* max-width: 400px; */
+      justify-content: center;
+      margin: auto;
+}
+
+.form_wrapper{
+      background: rgb(252, 236, 222);
+      width: fit-content;
+      max-width: 350px;
+      margin: 5px auto;
+      display: grid;
+      padding: 35px 50px;
+      gap: 20px;
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+      /* border: 2px solid rgba(160, 9, 160, 0.921); */
+      border-radius: 20px;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.helperText{
+      color: rgb(250, 69, 4);
+      margin: 5px auto auto auto;
+}
+.formErrorMsg, .helperText{
+      font-size: 0.85rem;
+      font-weight: 350;
+      /* color: rgb(118, 0, 0); */
+      text-align: justify;
+}
+
+.FormInput, .formErrorMsg,.helperText{
+      width: 220px;
+      justify-content: center;
+}
+.form_logo_wrapper{
+      margin: 0 auto;
+      width: 180px;
+}
+.form_logo_header{
+      color: rgb(250, 69, 4);
+      margin-top: 10px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      /* font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; */
+}
+.form_logo{
+      width: 50%;
+}
+.dashboard_wrapper{
+      margin: 50px;
+}
+
+.twobuttons{
+      display: flex;
+
+}

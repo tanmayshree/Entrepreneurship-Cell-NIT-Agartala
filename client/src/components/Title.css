@@ -1,0 +1,32 @@
+.section-title-box{
+    color: #ffe4a4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 70vw;
+    margin: 0 auto;
+    transform: translateY(7px);
+}
+.section-title{
+    font-size: 2.8rem;
+    font-family: 'Rubik Dirt', cursive;
+}
+
+@media screen and (max-width: 1100px) {
+    .section-title{
+        font-size: 2.5rem;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .section-title{
+        font-size: 2.3rem;
+    }
+}
+
+
+@media screen and (max-width: 500px) {
+    .section-title{
+        font-size: 1.8rem;
+    }
+}

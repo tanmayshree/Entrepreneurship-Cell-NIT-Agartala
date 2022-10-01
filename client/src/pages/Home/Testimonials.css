@@ -1,0 +1,10 @@
+.testimonial-wrapper{
+    position: relative;
+    max-width: 90vw;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    color: rgb(255, 193, 193);
+    line-height: 3rem;
+}

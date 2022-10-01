@@ -1,0 +1,84 @@
+.contact-page{
+    margin: 35px auto;
+    color: aliceblue;
+}
+
+.contact-persons{
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    margin: 30px auto;
+}
+.contact-name{
+    font-size: 1.5rem;
+    border-bottom: 0.5px solid rgb(255, 255, 255);
+    border-radius: 10px;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+}
+.contact-sm{
+    padding: 8px 10px;
+    font-size: 1.4rem;
+}
+
+.contact-person div{
+    border-radius: 10px;
+    border-top: 0.5px solid rgb(255, 255, 255);
+    margin-top: 0;
+}
+.contact-other{
+    text-align: center;
+    margin: 15px auto;
+    font-size: 170%;
+    align-items: center;
+    text-transform: capitalize;
+}
+.ecell-mail-link{
+    font-size: 1.8rem;
+    background: rgba(255, 255, 255, 0.137);
+    padding: 0.5rem;
+}
+
+@media screen and (max-width: 950px) {
+    .contact-persons{
+        gap: 40px;
+    }
+    .contact-name{
+        font-size: 1.3rem;
+    }
+    .contact-sm{
+        font-size: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .contact-persons{
+        gap: 20px;
+    }
+    .contact-name{
+        font-size: 1.1rem;
+    }
+    .contact-sm{
+        font-size: 1rem;
+    }
+    .ecell-mail-link{
+        font-size: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 570px) {
+    .contact-persons{
+        gap: 40px;
+        flex-direction: column;
+        width: 240px;
+    }
+    .contact-name{
+        font-size: 1.2rem;
+    }
+    .contact-sm{
+        font-size: 1.1rem;
+    }
+    .ecell-mail-link{
+        font-size: 1.5rem;
+    }
+}

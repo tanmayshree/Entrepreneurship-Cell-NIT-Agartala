@@ -1,0 +1,89 @@
+.message-page{
+    margin: 25px auto;
+}
+.message-wrapper{
+    display: flex;
+    color: white;
+    max-width: 800px;
+    margin: 50px auto 80px auto;
+    align-items: center;
+    gap: 35px;
+}
+
+.message-faculty img{
+    width: 220px;
+    box-shadow: 0 0 6px 2px white;
+    border-radius: 50%;
+}
+
+.faculty-name{
+    font-size: 1.2rem;
+    margin: 10px auto 5px auto;
+}
+
+.faculty-desgn{
+    font-size: 0.8rem;
+    color: rgb(252, 210, 217);
+    margin: 5px auto;
+}
+.message-content{
+    font-weight: 300;
+    line-height: 22px;
+}
+.message{
+    text-align: justify;
+}
+
+@media screen and (max-width:1000px) {
+    .message-wrapper{
+        max-width: 700px;
+    }
+}
+
+@media screen and (max-width:850px) {
+    .message-wrapper{
+        max-width: 600px;
+        margin: 25px auto;
+    }
+    .message-faculty img{
+        width: 180px;
+    }
+    .faculty-desgn{
+        font-size: 0.7rem;
+    }
+}
+
+@media screen and (max-width:700px) {
+    .message-wrapper{
+        max-width: 80vw;
+    }
+    .message-faculty img{
+        width: 150px;
+    }
+    .faculty-desgn{
+        font-size: 0.61rem;
+    }
+    .message-content{
+        font-size: 0.85rem;
+        line-height: 18px;
+    }
+    .message{
+        text-align: right;
+    }
+}
+
+@media screen and (max-width:550px) {
+    .message-wrapper{
+        flex-direction: column;
+        gap: 10px;
+    }
+    .message{
+        text-align: center;
+    }
+    .message-faculty img{
+        width: 160px;
+    }
+    .faculty-desgn{
+        font-size: 0.7rem;
+    }
+}

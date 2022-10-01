@@ -21,3 +21,5 @@ class LocalDevelopmentConfig(Config):
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_UNAUTHORIZED_VIEW = None
     WTF_CSRF_ENABLED = False
+
+    #mongodb+srv://tanmayshree:<password>@tanmayshree.0ax9h1r.mongodb.net/?retryWrites=true&w=majority

@@ -5,11 +5,16 @@ from flask import make_response
 import json
 from application.model import User
 
+def import_app():
+    from main import app
+    return app
+
 def token_required(role=[2]):
     def role_required(f):
         @wraps(f)
         def decorated(*args, **kwargs):
             # print(role)
+            app = import_app()
             token = None
             # jwt is passed in the request header
             if 'jwt_token' in request.headers:
@@ -20,7 +25,7 @@ def token_required(role=[2]):
             try:
                 # decoding the payload to fetch the stored details
                 # data = jwt.decode(token, app.config['SECRET_KEY'])
-                user = jwt.decode(token, "gibwaeilfvhnikfvhn468468784vr497drv9874v6sdrvdrv",algorithms=["HS256"])
+                user = jwt.decode(token, app.config['SECRET_KEY'],algorithms=["HS256"])
                 current_user = User.query.filter_by(id = user['public_id']).first()
                 print(user['role_id'])
                 if int(user['role_id']) not in role:

@@ -7,6 +7,10 @@ from datetime import datetime,timedelta
 from flask_security.utils import verify_password
 # from main import app
 
+def import_app():
+    from main import app
+    return app
+
 create_login_parser = reqparse.RequestParser()
 create_login_parser.add_argument('email')
 create_login_parser.add_argument('password')
@@ -21,11 +25,12 @@ class Login(Resource):
                   user = User.query.filter_by(email=email).first()
                   if user is not None:
                         if verify_password(password,user.password):
+                              app = import_app()
                               jwt_token = jwt.encode({
                                     'public_id': user.id,
                                     'role_id' : user.user_detail[0].role_id,
                                     'exp' : datetime.utcnow() + timedelta(minutes = 30)
-                                    }, "gibwaeilfvhnikfvhn468468784vr497drv9874v6sdrvdrv")
+                                    }, app.config['SECRET_KEY'])
                               return jsonify({'jwt_token' : jwt_token, 'role_id' : user.user_detail[0].role_id})
                         else:
                              return make_response(json.dumps("Invalid Password."),400)  

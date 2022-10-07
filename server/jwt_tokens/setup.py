@@ -4,17 +4,12 @@ from flask import request
 from flask import make_response
 import json
 from application.model import User
-
-def import_app():
-    from main import app
-    return app
+from extensions.app import app
 
 def token_required(role=[2]):
     def role_required(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            # print(role)
-            app = import_app()
             token = None
             # jwt is passed in the request header
             if 'jwt_token' in request.headers:

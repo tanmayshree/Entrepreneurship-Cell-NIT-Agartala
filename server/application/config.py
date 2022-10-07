@@ -1,25 +1,38 @@
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config():
     DEBUG = False
-    SQLITE_DB_DIR = None
-    SQLALCHEMY_DATABASE_URI = None
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
-    SECURITY_TOKEN_AUTHENTICATION_HEADER = "Authentication-Token"
+    SECURITY_UNAUTHORIZED_VIEW = None
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class LocalDevelopmentConfig(Config):
-    SQLITE_DB_DIR = os.path.join(basedir, "./../database")
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "ecell-nita-db.sqlite3")
+
+    ##### development config #####
     DEBUG= True
-    SECRET_KEY = "biweubfgvuiwbhfiuwfwi4635434fvwefvoiuhfwufuw"
-    SECURITY_PASSWORD_SALT = "gibwaeilfvhnikfvhn468468784vr497drv9874v6sdrvdrv"
-    SECURITY_PASSWORD_HASH = "bcrypt"
+
+    ##### Flask Security Config #####
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT')
+    SECURITY_PASSWORD_HASH = os.getenv('SECURITY_PASSWORD_HASH')
     SECURITY_REGISTERABLE = True
     SECURITY_CONFIRMABLE = False
     SECURITY_SEND_REGISTER_EMAIL = False
-    SECURITY_UNAUTHORIZED_VIEW = None
-    WTF_CSRF_ENABLED = False
 
-    #mongodb+srv://tanmayshree:<password>@tanmayshree.0ax9h1r.mongodb.net/?retryWrites=true&w=majority
+    ##### Flask SQLAlchemy Config #####
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+
+class ProductionConfig(Config):
+
+    ##### Flask Security Config #####
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT')
+    SECURITY_PASSWORD_HASH = os.getenv('SECURITY_PASSWORD_HASH','bcrypt')
+    SECURITY_REGISTERABLE = False
+    SECURITY_CONFIRMABLE = False
+    SECURITY_SEND_REGISTER_EMAIL = False
+
+    ##### Flask SQLAlchemy Config #####
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+
+

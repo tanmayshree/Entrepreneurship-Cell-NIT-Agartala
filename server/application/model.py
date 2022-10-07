@@ -1,4 +1,4 @@
-from database.database_config import db
+from extensions.database import db
 from flask_security import UserMixin, RoleMixin
 
 class Roles_Users(db.Model):
@@ -45,7 +45,5 @@ class Testimonial(db.Model):
     timestamp = db.Column(db.String)
     feedback = db.Column(db.String, nullable = False)
     validation_status = db.Column(db.Integer, nullable = False, default = 0) # 0:Pending, 1:Accepted, 2:Rejected
-    user_email = db.Column(db.Integer, db.ForeignKey('user.email'), nullable=False)
+    user_email = db.Column(db.String, db.ForeignKey('user.email'), nullable=False)
     
-
-

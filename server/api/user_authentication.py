@@ -5,11 +5,7 @@ from application.model import User
 import jwt
 from datetime import datetime,timedelta
 from flask_security.utils import verify_password
-# from main import app
-
-def import_app():
-    from main import app
-    return app
+from extensions.app import app
 
 create_login_parser = reqparse.RequestParser()
 create_login_parser.add_argument('email')
@@ -25,7 +21,6 @@ class Login(Resource):
                   user = User.query.filter_by(email=email).first()
                   if user is not None:
                         if verify_password(password,user.password):
-                              app = import_app()
                               jwt_token = jwt.encode({
                                     'public_id': user.id,
                                     'role_id' : user.user_detail[0].role_id,

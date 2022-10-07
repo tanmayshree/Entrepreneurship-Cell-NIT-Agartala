@@ -1,64 +1,54 @@
-from api.admin_validation_api import AdminValidationApi
-from api.testimonial_display_api import DisplayTestimonialsApi
-from api.testimonial_verification_api import VerifyTestimonialsApi
-from api.user_testimonial_api import *
-from api.admin_api import *
-from api.user_details_api import *
-from flask import Flask, render_template, redirect
-from api.user_validation_api import UserValidationApi
-from api.user_authentication import Login
-from application.config import *
-from application.model import *
-from flask_restful import Api
-from flask_security import Security, SQLAlchemySessionUserDatastore
-from database.database_config import db
+# ---------- IMPORTING THE REQUIRED MODULES ----------#
+import os
+from flask_security import Security, SQLAlchemyUserDatastore
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 
-app = None
+from extensions.app import app
+from extensions.database import db
+from extensions.api import api
+from application.config import LocalDevelopmentConfig,ProductionConfig
+from application.model import User,Role
+
+
+
+# ---------- CREATING THE FLASK APP INSTANCE ----------#
 def create_app():
-    app = Flask(__name__)
-    app.config.from_object(LocalDevelopmentConfig)
+    ##### Configuring the app #####
+    if(os.getenv("ENV","development")=="production"):
+        app.config.from_object(ProductionConfig) # Configures the ProductionConfig data with the app
+    else:
+        print("----- Starting the local development -----")
+        app.config.from_object(LocalDevelopmentConfig) # Configures the LocalDevelopmentConfig data with the app
+
+    ##### Initialising the app with the database instance #####
     db.init_app(app)
-    api = Api(app)
-    bcrypt = Bcrypt(app)
+
+    ##### Initialising the app with the restful api instance #####
+    api.init_app(app)
+
+    ##### Initialising the app with the Bcrypt #####
+    Bcrypt(app)
+
+    ##### Initialising the app with the CORS #####
     CORS(app)
-    user_datastore = SQLAlchemySessionUserDatastore(db.session, User, Role)
-    security = Security(app, user_datastore)
+
+    ##### Initialising the app with the Security #####
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    Security(app, user_datastore)
+
+    ##### Push the app context on the app stack #####
     app.app_context().push()
-    return (app,api)
-
-app,api = create_app()
-
-@app.route("/")
-def home():
-    return render_template("index.html")
+    return app,api,db
 
 
-api.add_resource(UserApi,"/api/user/getUserDetails","/api/user/delete","/api/register/userDetails")
+app,api,db=create_app()
 
-api.add_resource(TestimonialApi,"/api/addUserTestimonial","/api/get/userDashboard")
+# from api.api_uri import *
+# from api.user_authentication import Login
+# api.add_resource(Login, "/api/login")
 
-api.add_resource(DisplayTestimonialsApi, "/api/getApprovedTestimonials")
-api.add_resource(UserValidationApi, "/api/userValidation")
-api.add_resource(AdminValidationApi, "/api/adminValidation")
-# api.add_resource(AdminApi,"/api/modifySecondaryAdmin")
-api.add_resource(VerifyTestimonialsApi, "/api/admin/getPendingTestimonials", "/api/updateTestimonialValidationStatus")
-api.add_resource(Login, "/api/login")
-# @app.route("/view/<int:id>")
-# def view(id):
-#     tes=Testimonial.query.filter_by(id=id).first()
-#     return render_template("test.html", tes=tes)
-
-# @app.route("/add")
-# def test():
-#     tes=Testimonial(email="abc4.", name = "Tanmay", pass_year=2024, mobile_no=78945612130, feedback="hii")
-#     db.session.add(tes)
-#     db.session.commit()
-#     return render_template("test.html", tes=tes)
-
-
-
+# ---------- RUNNING THE APP ON DEVELOPMENT SERVER ----------#
 if __name__ == "__main__":
     app.run()
 

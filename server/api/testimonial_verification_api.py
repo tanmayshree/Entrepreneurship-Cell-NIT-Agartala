@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from flask import make_response
 from application.model import Testimonial
 from datetime import datetime
-from database.database_config import db
+from extensions.database import db
 from jwt_tokens.setup import token_required
 
 create_testimonial_status_parser = reqparse.RequestParser()

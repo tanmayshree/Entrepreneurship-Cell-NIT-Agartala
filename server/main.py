@@ -3,17 +3,17 @@ import os
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-
+from flask_restful import Api
 from extensions.app import app
 from extensions.database import db
-from extensions.api import api
 from application.config import LocalDevelopmentConfig,ProductionConfig
 from application.model import User,Role
-
-
+from overridden.forms import ExtendedRegisterForm
+from extensions.mail import mail
 
 # ---------- CREATING THE FLASK APP INSTANCE ----------#
 def create_app():
+    
     ##### Configuring the app #####
     if(os.getenv("ENV","development")=="production"):
         app.config.from_object(ProductionConfig) # Configures the ProductionConfig data with the app
@@ -25,7 +25,7 @@ def create_app():
     db.init_app(app)
 
     ##### Initialising the app with the restful api instance #####
-    api.init_app(app)
+    api=Api(app)
 
     ##### Initialising the app with the Bcrypt #####
     Bcrypt(app)
@@ -35,18 +35,47 @@ def create_app():
 
     ##### Initialising the app with the Security #####
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    Security(app, user_datastore)
+    Security(app, user_datastore,register_form=ExtendedRegisterForm)
 
+    ##### Initialising the app with the mail instance #####
+    mail.init_app(app)
+    app.extensions['mail'].debug = 0
+    
     ##### Push the app context on the app stack #####
     app.app_context().push()
-    return app,api,db
+    return app,api,db,mail
+
+app,api,db,mail=create_app()
 
 
-app,api,db=create_app()
+# -------------- Error handler for undefined endpoints --------------- #
+@app.errorhandler(404)
+def pageNotFound(e):
+    return "The url doesnot exist."
 
-# from api.api_uri import *
-# from api.user_authentication import Login
-# api.add_resource(Login, "/api/login")
+@app.route('/recovered')
+def post_recovery():
+    return "Successfully Recovered. Close this tab and login again."
+
+
+# -------------- Setting the API endpoints --------------- #
+from api.admin_validation_api import AdminValidationApi
+from api.testimonial_display_api import DisplayTestimonialsApi
+from api.testimonial_verification_api import VerifyTestimonialsApi
+from api.user_testimonial_api import *
+from api.admin_api import *
+from api.user_details_api import *
+from api.user_validation_api import UserValidationApi
+from api.user_authentication import Login,RegisterUser
+
+api.add_resource(UserApi,"/api/user/getUserDetails","/api/user/delete","/api/register/userDetails")
+api.add_resource(TestimonialApi,"/api/addUserTestimonial","/api/get/userDashboard")
+api.add_resource(DisplayTestimonialsApi, "/api/getApprovedTestimonials")
+api.add_resource(UserValidationApi, "/api/userValidation")
+api.add_resource(AdminValidationApi, "/api/adminValidation")
+api.add_resource(VerifyTestimonialsApi, "/api/admin/getPendingTestimonials", "/api/updateTestimonialValidationStatus")
+api.add_resource(Login, "/api/login")
+api.add_resource(RegisterUser, "/api/register")
 
 # ---------- RUNNING THE APP ON DEVELOPMENT SERVER ----------#
 if __name__ == "__main__":

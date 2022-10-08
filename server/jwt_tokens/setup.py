@@ -31,27 +31,3 @@ def token_required(role=[2]):
             return  f(user,current_user, *args, **kwargs)
         return decorated
     return role_required
-
-
-# def check_valid_role(role=None):
-#     def role_required(f):
-#         @wraps(f)
-#         def decorated(*args, **kwargs):
-#             print(role)
-#             # return  f(*args, **kwargs)
-#         return decorated
-#     return role_required
-
-            # token = None
-            # # jwt is passed in the request header
-            # #role id is encoded in the jwt token
-
-            # if 'jwt_token' in request.headers:
-            #     token = request.headers['jwt_token']
-            
-            # #return 401 if token is not passed
-
-            # if not token:
-            #     return make_response(json.dumps("Token is Missing!"),401)
-            # try:
-                

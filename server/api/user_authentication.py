@@ -6,6 +6,22 @@ import jwt
 from datetime import datetime,timedelta
 from flask_security.utils import verify_password
 from extensions.app import app
+from overridden.register import register
+
+
+# -------------- Register API -------------- #
+class RegisterUser(Resource):
+    '''
+    An api class to register user using flask security.\n
+    No parameters required.\n
+    No authentication required.\n
+    '''
+
+    def post(self):
+        response = register()
+        return response
+
+
 
 create_login_parser = reqparse.RequestParser()
 create_login_parser.add_argument('email')

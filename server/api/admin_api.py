@@ -2,7 +2,7 @@ from flask import make_response
 import json
 from flask_restful import Resource, fields, marshal, marshal_with, reqparse
 from application.model import Testimonial
-from database.database_config import db
+from extensions.database import db
 from flask_security import auth_required, login_required
 
 class AdminApi(Resource):

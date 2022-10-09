@@ -1,5 +1,6 @@
 # ---------- IMPORTING THE REQUIRED MODULES ----------#
 import os
+from flask import render_template
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -35,7 +36,7 @@ def create_app():
 
     ##### Initialising the app with the Security #####
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    Security(app, user_datastore,register_form=ExtendedRegisterForm)
+    security = Security(app, user_datastore,register_form=ExtendedRegisterForm)
 
     ##### Initialising the app with the mail instance #####
     mail.init_app(app)
@@ -43,20 +44,17 @@ def create_app():
     
     ##### Push the app context on the app stack #####
     app.app_context().push()
-    return app,api,db,mail
+    return app,api,db,mail,security
 
-app,api,db,mail=create_app()
+app,api,db,mail,security=create_app()
 
+# @app.endpoint(security.blueprint_name + '.reset_passowrd')
+# def reset_password(token)
 
 # -------------- Error handler for undefined endpoints --------------- #
 @app.errorhandler(404)
 def pageNotFound(e):
-    return "The url doesnot exist."
-
-@app.route('/recovered')
-def post_recovery():
-    return "Successfully Recovered. Close this tab and login again."
-
+    return render_template("pageNotFound.html")
 
 # -------------- Setting the API endpoints --------------- #
 from api.admin_validation_api import AdminValidationApi
@@ -76,6 +74,8 @@ api.add_resource(AdminValidationApi, "/api/adminValidation")
 api.add_resource(VerifyTestimonialsApi, "/api/admin/getPendingTestimonials", "/api/updateTestimonialValidationStatus")
 api.add_resource(Login, "/api/login")
 api.add_resource(RegisterUser, "/api/register")
+
+
 
 # ---------- RUNNING THE APP ON DEVELOPMENT SERVER ----------#
 if __name__ == "__main__":

@@ -1,0 +1,79 @@
+{# This template receives the following context:
+reset_link - the link that should be fetched (GET) to reset
+reset_token - this token is part of reset link - but can be used to
+construct arbitrary URLs for redirecting.
+user - the entire user model object
+security - the Flask-Security configuration
+#}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            width: 80%;
+            margin: auto;
+        }
+
+        .ecell-logo {
+            height: 25px;
+        }
+
+        .verify-button {
+            text-align: center;
+        }
+
+        .extra-message,
+        .extra-url {
+            text-align: center;
+            font-size: 0.7rem;
+        }
+
+        button {
+            background-color: rgb(255, 162, 0);
+            padding: 10px;
+            font-size: 1.25rem;
+            border: none;
+            box-shadow: 0 0px 2px 1.5px orangered;
+            border-radius: 10px;
+        }
+
+        button:hover {
+            background-color: orangered;
+        }
+
+        .button-url {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="" alt="" class="ecell-logo">
+    <h3>Hii, {{ user.name }}</h3>
+    <p class="message">Please follow the given instructions to reset your password : </p>
+    <ol>
+        <li>Click on the reset button below. It will take to the reset page.</li>
+        <li>Enter your new password and confirm it once.</li>
+        <li>Click submit</li>
+    </ol>
+    <strong>Note : This link is valid only for 5 minutes. </strong>
+    <br>
+    <div class="verify-button"><button><a href="http://localhost:3000/reset?reset_token={{ reset_token }}" class="button-url">Reset Password</a></button>
+    </div>
+    <br><br>
+    <p class="extra-message">Please click on the below link if the above button doesn't work.</p>
+    <p class="extra-message"><a href="http://localhost:3000/reset?reset_token={{ reset_token }}">{{ _fsdomain('Reset Password') }}</a></p>
+    <br><br>
+    <p class="extra-message"><strong>Entrepreneurship Cell, NIT Agartala</strong></p>
+</body>
+
+</html>

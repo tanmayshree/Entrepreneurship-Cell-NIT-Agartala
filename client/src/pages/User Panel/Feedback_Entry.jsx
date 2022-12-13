@@ -2,8 +2,8 @@ import { Button, TextareaAutosize } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "./../../assets/logo-black.png";
-
-
+import api_url  from "../../global_data.js"
+import jwt_decode from "jwt-decode"
 const FeedbackEntry = () => {
 
   let navigate_to = useNavigate();
@@ -16,7 +16,7 @@ const FeedbackEntry = () => {
         feedback: e.target.feedback.value,
         validation_status: false
       };
-      const url = "https://backend-ecell.herokuapp.com/api/addUserTestimonial";
+      const url = api_url()+"api/addUserTestimonial";
       const init_ob = {
         method: "POST",
         mode: "cors",
@@ -41,46 +41,29 @@ const FeedbackEntry = () => {
     event.preventDefault();
     const jwt_token = localStorage.getItem('jwt_token')
     if (jwt_token) {
-      const url = "https://backend-ecell.herokuapp.com/logout"
-      const init_ob = {
-        method: "GET",
-        mode: 'cors',
-      }
-      await fetch(url, init_ob)
-      localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
+      localStorage.removeItem('jwt_token'); 
+      localStorage.removeItem('role_id')
       navigate_to("/testimonials");
-      console.log("Succesfully Logged Out")
+      console.log("Succesfully Logged Out");
     }
     else {
-      console.log("You are not logged in 01.")
+      console.log("You are not logged in 01.");
     }
   }
   useEffect(() => async () => {
     const jwt_token = localStorage.getItem('jwt_token')
     if (jwt_token) {
-      const url = "https://backend-ecell.herokuapp.com/api/userValidation";
-      const init_ob = {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "jwt_token": jwt_token,
-          'Access-Control-Allow-Origin': '*'
-        },
-      };
-      const res1 = await fetch(url, init_ob);
-      if (res1 && res1.ok) {
-        console.log(res1)
-        res1.json().catch(() => {
-          navigate_to("/")
-          console.log("In catch")
-          console.log("You are not logged in 07.")
-          localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
-        }
-        )
+
+      try{
+        var decoded = jwt_decode(jwt_token);
+        console.log("decoded = ",decoded);
       }
-      else {
-        navigate_to("/")
-        console.log("You are not logged in 02.")
+      catch(error){
+        console.log(error);
+        localStorage.removeItem('jwt_token'); 
+        localStorage.removeItem('role_id')
+        navigate_to("/");
+        console.log("You are not logged in 07.");
       }
     }
     else {

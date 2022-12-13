@@ -2,6 +2,7 @@ import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api_url from "../../global_data.js"
 
 // function createData(sl_no, timestamp, feedback, validation_status) {
 //   return { sl_no, timestamp, feedback, validation_status };
@@ -17,28 +18,17 @@ const UserDashboard = () => {
 
   const handleLogout = async (event) => {
     event.preventDefault();
-    const jwt_token = localStorage.getItem('jwt_token')
-    if (jwt_token) {
-      const url = "https://backend-ecell.herokuapp.com/logout"
-      const init_ob = {
-        method: "GET",
-        mode: 'cors',
-      }
-      await fetch(url, init_ob)
-      localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
+      localStorage.removeItem('jwt_token'); 
+      localStorage.removeItem('role_id')
       navigate_to("/testimonials");
       console.log("Succesfully Logged Out")
-    }
-    else {
-      console.log("You are not logged in 01.")
-    }
   }
 
   const getData = async () => {
     console.log("randobhj");
     const jwt_token = localStorage.getItem('jwt_token')
     if (jwt_token) {
-      const url = "https://backend-ecell.herokuapp.com/api/userValidation";
+      const url = api_url()+"api/userValidation";
       const init_ob = {
         method: "GET",
         mode: "cors",
@@ -56,7 +46,7 @@ const UserDashboard = () => {
           // Add navigate option
         }
         )
-        const url1 = "https://backend-ecell.herokuapp.com/api/get/userDashboard";
+        const url1 = api_url()+"api/get/userDashboard";
         const init_ob1 = {
           method: "GET",
           mode: "cors",

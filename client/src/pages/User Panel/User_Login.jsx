@@ -6,6 +6,8 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import logo from "./../../assets/logo-black.png";
 import "./form.css"
+import api_url from "../../global_data.js"
+import jwt_decode from "jwt-decode"
 var encryptor = require('simple-encryptor')("drfgbjhumuuuukyhghuygjkgt");
 
 const UserLogin = () => {
@@ -22,7 +24,7 @@ const UserLogin = () => {
                         email: e.target.email.value,
                         password: e.target.password.value,
                   };
-                  const url = "https://backend-ecell.herokuapp.com/api/login";
+                  const url = api_url() + "api/login";
                   const init_ob = {
                         method: "POST",
                         mode: "cors",
@@ -33,14 +35,14 @@ const UserLogin = () => {
                         body: JSON.stringify(user),
                   };
 
-                  const res = await fetch(url, init_ob)
-                  console.log(res)
-                  console.log("wscrfgvbyh");
+                  const res = await fetch(url, init_ob).catch((e)=>{
+                        alert("Network Error");
+                  });
+
                   if (res && res.ok) {
                         const data = await res.json();
                         const jwt_token = data.jwt_token;
                         const role_id = encryptor.encrypt(data.role_id);
-                        console.log(role_id)
                         localStorage.setItem("jwt_token", jwt_token);
                         localStorage.setItem("role_id", role_id);
                         if (data.role_id === 0 || data.role_id === 1) {
@@ -51,7 +53,11 @@ const UserLogin = () => {
                         }
                   }
                   else {
-                        alert("Invalid Email or Password.");
+                        res.json().then((d)=>{
+                              alert(d);
+                        }).catch(()=>{
+                              alert("Something went wrong.");
+                        })
                   }
             }
       };
@@ -59,38 +65,49 @@ const UserLogin = () => {
       useEffect(() => async () => {
             const jwt_token = localStorage.getItem('jwt_token')
             if (jwt_token) {
-                  const role_id = encryptor.decrypt(localStorage.getItem('role_id'))
-                  let url;
-                  if (role_id === 0 || role_id === 1) {
-                        url = "https://backend-ecell.herokuapp.com/api/adminValidation";
-                  }
-                  else {
-                        url = "https://backend-ecell.herokuapp.com/api/userValidation";
-                  }
-                  const init_ob = {
-                        method: "GET",
-                        mode: "cors",
-                        headers: {
-                              "jwt_token": jwt_token,
-                              'Access-Control-Allow-Origin': '*'
-                        },
-                  };
-                  console.log("first")
-                  const res1 = await fetch(url, init_ob);
-                  if (res1 && res1.ok) {
-                        console.log("Previous Login Success01")
-                        console.log(role_id)
+                  try {
+                        var decoded = jwt_decode(jwt_token);
+                        console.log("decoded = ", decoded);
+                        const role_id = encryptor.decrypt(localStorage.getItem('role_id'))
+                        let url;
                         if (role_id === 0 || role_id === 1) {
-                              navigate_to("/view-pending-testimonial-status");
+                              url = api_url() + "api/adminValidation";
                         }
                         else {
-                              navigate_to("/add-testimonial");
+                              url = api_url() + "api/userValidation";
+                        }
+                        const init_ob = {
+                              method: "GET",
+                              mode: "cors",
+                              headers: {
+                                    "jwt_token": jwt_token,
+                                    'Access-Control-Allow-Origin': '*'
+                              },
+                        };
+                        console.log("first")
+                        const res1 = await fetch(url, init_ob);
+                        if (res1 && res1.ok) {
+                              console.log("Previous Login Success01")
+                              console.log(role_id)
+                              if (role_id === 0 || role_id === 1) {
+                                    navigate_to("/view-pending-testimonial-status");
+                              }
+                              else {
+                                    navigate_to("/add-testimonial");
+                              }
+                        }
+                        else {
+                              localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
+                              navigate_to("/")
+                              console.log("You are not logged in03.")
                         }
                   }
-                  else {
-                        localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
-                        navigate_to("/")
-                        console.log("You are not logged in03.")
+                  catch (error) {
+                        console.log(error);
+                        localStorage.removeItem('jwt_token');
+                        localStorage.removeItem('role_id')
+                        navigate_to("/");
+                        console.log("You are not logged in 07.");
                   }
             }
       }, []);
@@ -105,6 +122,7 @@ const UserLogin = () => {
                         <Button type="reset" color="warning" variant="contained">Reset</Button>
                         <Button type="submit" variant="contained" color="warning">Login</Button>
                         <NavLink to="/register" style={{ color: "rgb(250, 69, 4)" }}>New User? Register Here</NavLink>
+                        <NavLink to="/send_reset_instruction" style={{ color: "rgb(250, 69, 4)" }}>Forgot Password?</NavLink>
                   </form>
             </div>
       );

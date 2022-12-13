@@ -3,9 +3,10 @@ import { NavLink, useNavigate } from "react-router-dom";
 import React from "react";
 import logo from "./../../assets/logo-black.png";
 import { Button, TextField } from "@mui/material";
-
 import validator from 'validator';
 import { useState } from "react";
+import api_url from "../../global_data.js"
+import jwt_decode from "jwt-decode"
 
 function UserRegistration() {
 
@@ -33,49 +34,32 @@ function UserRegistration() {
 
 
   const handleRegister = async (e) => {
+
+    // Prevent auto refreshing of the page
     e.preventDefault();
-    const jwt_token = localStorage.getItem("jwt_token");
-    if (jwt_token) {
-      alert("You are already logged in.");
-      navigate_to("/view-testimonial-status");
+    if (passwordError) {
+      alert("Please keep a check of constraints !!! ");
     }
     else {
+      // Get and check for token in local storage
+      const jwt_token = localStorage.getItem("jwt_token");
+      if (jwt_token) {
+        alert("You are already logged in.");
+        navigate_to("/view-testimonial-status");
+      }
+      else {
+        const user = {
+          email: e.target.email.value,
+          password: e.target.password.value,
+          password_confirm: e.target.password_confirm.value,
+          name: e.target.name.value,
+          organisation: e.target.organisation.value,
+          pass_year: e.target.pass_year.value,
+          mobile_no: e.target.mobile_no.value,
+        };
 
-      // REGISTER
-      const user = {
-        email: e.target.email.value,
-        password: e.target.password.value,
-        password_confirm: e.target.password_confirm.value,
-      };
-
-      const url = "https://backend-ecell.herokuapp.com/register";
-      const init_ob = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify(user),
-      };
-      console.log(2);
-      const res = await fetch(url, init_ob);
-      console.log(res)
-      console.log(3);
-
-      // SUCCESSFUL REGISTRATION
-      if (res && res.ok) {
-        // LOGOUT
-        const url1 = "https://backend-ecell.herokuapp.com/logout"
-        const init_ob1 = {
-          method: "GET",
-          mode: 'cors',
-        }
-        await fetch(url1, init_ob1)
-
-        // lOGIN
-        const url2 = "https://backend-ecell.herokuapp.com/api/login";
-        const init_ob2 = {
+        const url = api_url() + "api/register";
+        const init_ob = {
           method: "POST",
           mode: "cors",
           headers: {
@@ -84,76 +68,25 @@ function UserRegistration() {
           },
           body: JSON.stringify(user),
         };
-        const res = await fetch(url2, init_ob2)
-        console.log(res)
+        const res = await fetch(url, init_ob).catch((e) => {
+          alert("Network Error");
+        });
 
-        // Successful login
         if (res && res.ok) {
-          const data = await res.json();
-          const jwt_token = data.jwt_token;
-          localStorage.setItem("jwt_token", jwt_token);
-
-          // REGISTER THE DETAILS
-          const user_details = {
-            user_email: e.target.email.value,
-            name: e.target.name.value,
-            organisation: e.target.organisation.value,
-            pass_year: e.target.pass_year.value,
-            mobile_no: e.target.mobile_no.value,
-          };
-          const url = "https://backend-ecell.herokuapp.com/api/register/userDetails";
-          const init_ob = {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "Content-Type": "application/json",
-              "jwt_token": jwt_token,
-              'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify(user_details),
-          };
-          const res1 = await fetch(url, init_ob);
-
-          // 2ND PHASE OF REGISTRATION SUCCESS
-          if (res1 && res1.ok) {
-            alert("Successfully Registered and logged in.");
-            console.timeStamp();
-            navigate_to(`/add-testimonial`);
-          }
-          // 2ND PHASE OF REGISTRATION not SUCCESS
-          else {
-            // delete the 1st phase details
-            const jwt_token = localStorage.getItem('jwt_token');
-            if (jwt_token) {
-              const url = "https://backend-ecell.herokuapp.com/api/user/delete";
-              const init_ob = {
-                method: "DELETE",
-                mode: 'cors',
-                headers: {
-                  "jwt_token": jwt_token,
-                  'Access-Control-Allow-Origin': '*'
-                },
-              };
-              const response = await fetch(url, init_ob);
-
-              // Successful deletion
-              if (response && response.ok) {
-                // const data = await response.json()
-                localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id');
-                // console.log(data)
-                alert("Registration Unsuccessful. Check the details and try again.");
-              }
-            }
-
-            // Login failed
-            else {
-              console.log("Login failed")
-            }
-          }
+          alert("Successfully Registered. \nPlease check your email for confirmation link.");
+          navigate_to("/login");
         }
-        // initial registration failed
         else {
-          console.log(34);
+          res.json().then((d) => {
+            for (const key in d.response.errors) {
+              var error = d.response.errors[key];
+              break;
+            }
+            alert(error);
+          }).catch((e) => {
+            console.log(e);
+            alert("Something went wrong");
+          })
         }
       }
     }
@@ -163,22 +96,16 @@ function UserRegistration() {
   useEffect(() => async () => {
     const jwt_token = localStorage.getItem('jwt_token');
     if (jwt_token) {
-      const url = "https://backend-ecell.herokuapp.com/api/userValidation";
-      const init_ob = {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "jwt_token": jwt_token,
-        },
-      };
-      const res1 = await fetch(url, init_ob);
-      if (res1 && res1.ok) {
-        navigate_to("/add-testimonial");
+      try {
+        var decoded = jwt_decode(jwt_token);
+        console.log("decoded = ", decoded);
       }
-      else {
-        localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id');
+      catch (error) {
+        console.log(error);
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('role_id')
         navigate_to("/");
-        console.log("You are not logged in06.");
+        console.log("You are not logged in 07.");
       }
     }
   });
@@ -221,6 +148,7 @@ function UserRegistration() {
         <Button type="reset" color="warning" variant="contained">Reset</Button>
         <Button type="submit" color="warning" variant="contained">Register</Button>
         <NavLink to="/login" style={{ color: "rgb(250, 69, 4)" }}>Already have an account? Login</NavLink>
+        <NavLink to="/confirm" style={{ color: "rgb(250, 69, 4)" }}>Not Confirmed Your email? Click here</NavLink>
       </form>
     </div>
   );

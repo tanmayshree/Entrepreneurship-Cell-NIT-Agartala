@@ -25,6 +25,9 @@ import UserLogin from './pages/User Panel/User_Login';
 import UserDashboard from './pages/User Panel/User_Dashboard';
 import AdminTestimonialManagement from './pages/Admin Panel/AdminTestimonialManagement';
 import AdminPage from './pages/Admin Panel/AdminPage';
+import ConfirmEmail from './pages/User Panel/confirm_email';
+import ResetPassword from './pages/User Panel/reset_password';
+import ResetPasswordHandler from './pages/User Panel/reset_password_handler';
 
 function App() {  
   const [loading, setLoading] = useState(false);
@@ -88,6 +91,10 @@ function App() {
               <Route path="/view-testimonial-status" exact element={<UserDashboard />} />
               {/* <Route path="/view-pending-testimonial-status" exact element={<AdminTestimonialManagement />} /> */}
               <Route path="/view-pending-testimonial-status" exact element={<AdminPage />} />
+              <Route path="/confirm" exact element={<ConfirmEmail />} />
+              <Route path="/send_reset_instruction" exact element={<ResetPassword />} />
+              <Route path="/reset" exact element={<ResetPasswordHandler />} />
+              
             </Routes>
             <Footer />
           </span>

@@ -3,31 +3,21 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./../User Panel/form.css";
+import api_url from "../../global_data.js"
+
 const AdminTestimonialManagement = () => {
       const [row, setRow] = useState([]);
       const [dummy, setDummy] = useState();
-      // var rows = [];
       let navigate_to = useNavigate();
 
       const [dashboardData, setDashboardData] = useState(false);
-      
+
       const handleLogout = async (event) => {
             event.preventDefault();
-            const jwt_token = localStorage.getItem('jwt_token')
-            if (jwt_token) {
-                  const url = "https://backend-ecell.herokuapp.com/logout"
-                  const init_ob = {
-                        method: "GET",
-                        mode: 'cors',
-                  }
-                  await fetch(url, init_ob)
-                  localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
-                  navigate_to("/testimonials");
-                  console.log("Succesfully Logged Out")
-            }
-            else {
-                  console.log("You are not logged in 01.")
-            }
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('role_id')
+            navigate_to("/testimonials");
+            console.log("Succesfully Logged Out")
       }
 
       const handleStatusUpdate = async (event, id, validation_status) => {
@@ -35,7 +25,7 @@ const AdminTestimonialManagement = () => {
             console.log(id)
             const jwt_token = localStorage.getItem('jwt_token')
             if (jwt_token) {
-                  const url = "https://backend-ecell.herokuapp.com/api/adminValidation";
+                  const url = api_url() + "api/adminValidation";
                   const init_ob = {
                         method: "GET",
                         mode: "cors",
@@ -58,7 +48,7 @@ const AdminTestimonialManagement = () => {
                               "id": id,
                               "validation_status": validation_status
                         }
-                        const url1 = "https://backend-ecell.herokuapp.com/api/updateTestimonialValidationStatus";
+                        const url1 = api_url() + "api/updateTestimonialValidationStatus";
                         const init_ob1 = {
                               method: "PUT",
                               mode: "cors",
@@ -94,7 +84,7 @@ const AdminTestimonialManagement = () => {
             console.log("aaaaaaaaaaaaarandobhj");
             const jwt_token = localStorage.getItem('jwt_token')
             if (jwt_token) {
-                  const url = "https://backend-ecell.herokuapp.com/api/adminValidation";
+                  const url = api_url() + "api/adminValidation";
                   const init_ob = {
                         method: "GET",
                         mode: "cors",
@@ -112,7 +102,7 @@ const AdminTestimonialManagement = () => {
                               // Add navigate option
                         }
                         )
-                        const url1 = "https://backend-ecell.herokuapp.com/api/admin/getPendingTestimonials";
+                        const url1 = api_url() + "api/admin/getPendingTestimonials";
                         const init_ob1 = {
                               method: "GET",
                               mode: "cors",
@@ -128,15 +118,6 @@ const AdminTestimonialManagement = () => {
                               console.log(row);
                               setDashboardData(true);
                         })
-                        /*
-                                fetch(url1, init_ob1)
-                                  .then(response => { return (response.json()) })
-                                  .then((data) => {
-                                    setRow(data);
-                                    console.log(data);
-                                    setDashboardData(true);
-                                  })
-                                  */
                   }
                   else {
                         navigate_to("/")
@@ -153,92 +134,91 @@ const AdminTestimonialManagement = () => {
       }, []);
 
       if (dashboardData) {
-      if(row.length!=0)
-            {
-            return (
-                  <div className="dashboard_wrapper">
-                        <Button type="submit" color="warning" variant="contained" onClick={handleLogout}>Logout</Button>
-                        <br /><br /><br />
-                        <TableContainer component={Paper}>
-                              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            if (row.length != 0) {
+                  return (
+                        <div className="dashboard_wrapper">
+                              <Button type="submit" color="warning" variant="contained" onClick={handleLogout}>Logout</Button>&nbsp;&nbsp;
+                              <br /><br /><br />
+                              <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
 
-                                    <TableHead>
-                                          <TableRow>
-                                                <TableCell>Sl. No.</TableCell>
-                                                <TableCell>Timestamp</TableCell>
-                                                <TableCell>Name</TableCell>
-                                                <TableCell>Email</TableCell>
-                                                <TableCell>Feedback</TableCell>
-                                                <TableCell>Organisation</TableCell>
-                                                <TableCell>Action (Approve/Reject)</TableCell>
-                                          </TableRow>
-                                    </TableHead>
-
-
-                                    <TableBody>
-                                          {row.map((row, index) => (
-                                                <TableRow
-                                                      key={row.id}
-                                                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                                >
-                                                      <TableCell component="th" scope="row">
-                                                            {index + 1}
-                                                      </TableCell>
-                                                      <TableCell align="left">{row.timestamp}</TableCell>
-                                                      <TableCell align="left">{row.name}</TableCell>
-                                                      <TableCell align="left">{row.email}</TableCell>
-                                                      <TableCell align="left">{row.feedback}</TableCell>
-                                                      <TableCell align="left">{row.organisation}</TableCell>
-                                                      <TableCell align="left" style={{ "display": "flex" }}>
-                                                            <Button type="submit" color="warning" variant="contained" onClick={(event) => handleStatusUpdate(event, row.id, 1)}><i className="fa-solid fa-check" /></Button>
-                                                            &nbsp;
-                                                            <Button type="submit" color="warning" variant="contained" onClick={(event) => handleStatusUpdate(event, row.id, 2)}><i className="fa-solid fa-xmark" /></Button>
-                                                      </TableCell>
+                                          <TableHead>
+                                                <TableRow>
+                                                      <TableCell>Sl. No.</TableCell>
+                                                      <TableCell>Timestamp</TableCell>
+                                                      <TableCell>Name</TableCell>
+                                                      <TableCell>Email</TableCell>
+                                                      <TableCell>Feedback</TableCell>
+                                                      <TableCell>Organisation</TableCell>
+                                                      <TableCell>Action (Approve/Reject)</TableCell>
                                                 </TableRow>
-                                          ))}
-                                    </TableBody>
-                              </Table>
-                        </TableContainer>
-                  </div>
-            );
+                                          </TableHead>
+
+
+                                          <TableBody>
+                                                {row.map((row, index) => (
+                                                      <TableRow
+                                                            key={row.id}
+                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                      >
+                                                            <TableCell component="th" scope="row">
+                                                                  {index + 1}
+                                                            </TableCell>
+                                                            <TableCell align="left">{row.timestamp}</TableCell>
+                                                            <TableCell align="left">{row.name}</TableCell>
+                                                            <TableCell align="left">{row.email}</TableCell>
+                                                            <TableCell align="left">{row.feedback}</TableCell>
+                                                            <TableCell align="left">{row.organisation}</TableCell>
+                                                            <TableCell align="left" style={{ "display": "flex" }}>
+                                                                  <Button type="submit" color="warning" variant="contained" onClick={(event) => handleStatusUpdate(event, row.id, 1)}><i className="fa-solid fa-check" /></Button>
+                                                                  &nbsp;
+                                                                  <Button type="submit" color="warning" variant="contained" onClick={(event) => handleStatusUpdate(event, row.id, 2)}><i className="fa-solid fa-xmark" /></Button>
+                                                            </TableCell>
+                                                      </TableRow>
+                                                ))}
+                                          </TableBody>
+                                    </Table>
+                              </TableContainer>
+                        </div>
+                  );
             }
-      else {
-            return (
-                  <div className="dashboard_wrapper">
-                        <TableContainer component={Paper}>
-                              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            else {
+                  return (
+                        <div className="dashboard_wrapper">
+                              <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
 
-                                    <TableHead>
-                                          <TableRow>
-                                                <TableCell>Sl. No.</TableCell>
-                                                <TableCell>Timestamp</TableCell>
-                                                <TableCell>Name</TableCell>
-                                                <TableCell>Email</TableCell>
-                                                <TableCell>Feedback</TableCell>
-                                                <TableCell>Organisation</TableCell>
-                                                <TableCell>Action (Approve/Reject)</TableCell>
-                                          </TableRow>
-                                    </TableHead>
+                                          <TableHead>
+                                                <TableRow>
+                                                      <TableCell>Sl. No.</TableCell>
+                                                      <TableCell>Timestamp</TableCell>
+                                                      <TableCell>Name</TableCell>
+                                                      <TableCell>Email</TableCell>
+                                                      <TableCell>Feedback</TableCell>
+                                                      <TableCell>Organisation</TableCell>
+                                                      <TableCell>Action (Approve/Reject)</TableCell>
+                                                </TableRow>
+                                          </TableHead>
 
-                                    <TableBody>
-                                          <TableRow>
-                                                <TableCell></TableCell>
-                                                <TableCell></TableCell>
-                                                <TableCell align="right">No</TableCell>
-                                                <TableCell>Pending</TableCell>
-                                                <TableCell>Testimonials</TableCell>
-                                                <TableCell></TableCell>
-                                                <TableCell></TableCell>
-                                          </TableRow>
-                                    </TableBody>
+                                          <TableBody>
+                                                <TableRow>
+                                                      <TableCell></TableCell>
+                                                      <TableCell></TableCell>
+                                                      <TableCell align="right">No</TableCell>
+                                                      <TableCell>Pending</TableCell>
+                                                      <TableCell>Testimonials</TableCell>
+                                                      <TableCell></TableCell>
+                                                      <TableCell></TableCell>
+                                                </TableRow>
+                                          </TableBody>
 
 
-                              </Table>
-                        </TableContainer>
-                  </div>
-            );
+                                    </Table>
+                              </TableContainer>
+                        </div>
+                  );
             }
-}
+      }
       else
             return (
                   <div className="dashboard_wrapper">
@@ -273,6 +253,7 @@ const AdminTestimonialManagement = () => {
                               </Table>
                         </TableContainer>
                   </div>
+
             );
 };
 

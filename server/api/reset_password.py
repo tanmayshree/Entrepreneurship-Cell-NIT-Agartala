@@ -54,11 +54,9 @@ class ResetPassword(Resource):
             if 'reset_token' in request.headers:
                 token = request.headers["reset_token"]
                 expired, invalid, user = reset_password_token_status(token)
-                if user is None or invalid:
-                    return make_response(json.dumps("Inappropriate attempt to reset password."),400)  
-                elif expired:
-                    send_reset_password_instructions(user)
-                    return make_response(json.dumps("Reset time limit has exceeded and another email has been sent to reset password."),400)  
+                print(expired, invalid, user)
+                if user is None or invalid or expired:
+                    return make_response(json.dumps("Inappropriate attempt to reset password!!! \nMay be the time limit has expired or this link has already been used."),400)  
                 else:
                     form_class = _security.reset_password_form
                     form = form_class(MultiDict(request.get_json()), meta=suppress_form_csrf())
@@ -78,7 +76,7 @@ class ResetPassword(Resource):
                             send_reset_password_instructions(user)
                             return make_response(json.dumps("Password reset email sent."),200)  
                         else:
-                            return make_response(json.dumps("User doesnot exists."),400) 
+                            return make_response(json.dumps("User with specified email doesnot exists."),400) 
                     else:
                         return make_response(json.dumps("Email is compulsory."),400)
                 else:

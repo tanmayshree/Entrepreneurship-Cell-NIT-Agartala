@@ -37,15 +37,18 @@ class Login(Resource):
             if(email is not None and password is not None):
                   user = User.query.filter_by(email=email).first()
                   if user is not None:
-                        if verify_password(password,user.password):
-                              jwt_token = jwt.encode({
-                                    'public_id': user.id,
-                                    'role_id' : user.role_id,
-                                    'exp' : datetime.utcnow() + timedelta(minutes = 30)
-                                    }, app.config['SECRET_KEY'])
-                              return jsonify({'jwt_token' : jwt_token, 'role_id' : user.role_id})
+                        if user.confirmed_at:
+                              if verify_password(password,user.password):
+                                    jwt_token = jwt.encode({
+                                          'public_id': user.id,
+                                          'role_id' : user.role_id,
+                                          'exp' : datetime.utcnow() + timedelta(minutes = 30)
+                                          }, app.config['SECRET_KEY'])
+                                    return jsonify({'jwt_token' : jwt_token, 'role_id' : user.role_id})
+                              else:
+                                    return make_response(json.dumps("Invalid Password."),400) 
                         else:
-                             return make_response(json.dumps("Invalid Password."),400)  
+                              return make_response(json.dumps("Please confirm your email first."),400)  
                   else:
                        return make_response(json.dumps("User doesnot exist."),400) 
             else:

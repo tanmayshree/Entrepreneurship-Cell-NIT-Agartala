@@ -20,9 +20,12 @@ class GrantPermissions(Resource):
                         try:
                             role_id = int(request.get_json()["role_id"])
                             user1 = User.query.filter_by(email=email).first();
-                            user1.role_id = role_id
-                            db.session.commit()
-                            return make_response(json.dumps("Successfully Updated"),200)
+                            if user1:
+                                user1.role_id = role_id
+                                db.session.commit()
+                                return make_response(json.dumps("Successfully Updated"),200)
+                            else:
+                                return make_response(json.dumps("User not found with this email id."),400)
                         except:
                             return make_response(json.dumps("Role_id must be an integer from 0 to 2"),400)
                     else:   

@@ -1,5 +1,8 @@
+# -------------- IMPORTING THE REQUIRED MODULES --------------- #
 import os
-from datetime import datetime,timedelta
+
+# -------------- PATH OF BASE DIRECTORY --------------- #
+basedir = os.path.abspath(os.path.dirname(__file__)) # path of the base directory
 
 class Config():
     DEBUG = False
@@ -10,7 +13,11 @@ class Config():
 class LocalDevelopmentConfig(Config):
 
     ##### Development config #####
-    DEBUG= True
+    DEBUG = True
+
+    ##### Flask SQLAlchemy / Database Config #####
+    SQLITE_DB_DIR = os.path.join(basedir, '../database')
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "Development.sqlite3")
 
     ##### Flask Security Config #####
     SECRET_KEY = os.getenv('SECRET_KEY')
@@ -23,13 +30,10 @@ class LocalDevelopmentConfig(Config):
     SECURITY_CONFIRMABLE = True
     SECURITY_CONFIRM_EMAIL_WITHIN = '1 days'
     SECURITY_AUTO_LOGIN_AFTER_CONFIRM = False
-    SECURITY_POST_CONFIRM_VIEW = 'https://www.google.com/' # the url to redirect after confirming
+    SECURITY_POST_CONFIRM_VIEW = 'http://localhost:3000/' # the url to redirect after confirming
 
-    SECURITY_RECOVERABLE = True
-    SECURITY_POST_RESET_VIEW = 'https://www.google.com/' # the url to redirect after reseting
-
-    ##### Flask SQLAlchemy Config #####
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    SECURITY_RECOVERABLE = False # We dont need the /reset endpoint provided by flask security as it is implemented manually.
+    SECURITY_RESET_PASSWORD_WITHIN = "5 minutes"
 
     ##### Flask Mail Config #####
     MAIL_SERVER = os.getenv('MAIL_SERVER')
@@ -41,6 +45,10 @@ class LocalDevelopmentConfig(Config):
 
 
 class ProductionConfig(Config):
+
+    ##### Flask SQLAlchemy / Database Config #####
+    SQLITE_DB_DIR = os.path.join(basedir, '../database')
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "Production.sqlite3")
 
     ##### Flask Security Config #####
     SECRET_KEY = os.getenv('SECRET_KEY')
@@ -55,11 +63,8 @@ class ProductionConfig(Config):
     SECURITY_AUTO_LOGIN_AFTER_CONFIRM = False
     SECURITY_POST_CONFIRM_VIEW = 'http://localhost:3000/' # the url to redirect after confirming
 
-    SECURITY_RECOVERABLE = True
+    SECURITY_RECOVERABLE = False # We dont need the /reset endpoint provided by flask security as it is implemented manually.
     SECURITY_RESET_PASSWORD_WITHIN = "5 minutes"
-
-    ##### Flask SQLAlchemy Config #####
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 
     ##### Flask Mail Config #####
     MAIL_SERVER = os.getenv('MAIL_SERVER')
@@ -68,7 +73,3 @@ class ProductionConfig(Config):
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD') 
-
-
-
-# btywvosbjtniyubd

@@ -20,20 +20,17 @@ class VerifyTestimonialsApi(Resource):
                   testimonials_list = []
                   # print(testimonials)
                   for i in testimonials:
-                        # print(i.user.user_detail[0].name)
-                        # print(i)
                         data = {
                               "id" : i.id,
                               "feedback" : i.feedback,
                               "timestamp" : str(datetime.strftime(datetime.strptime(i.timestamp[:10],"%Y-%m-%d"),"%d-%m-%Y")),
                               "email":i.user_email,
-                              "name": i.user.user_detail[0].name,
-                              "organisation": i.user.user_detail[0].organisation
+                              "name": i.user.name,
+                              "organisation": i.user.organisation
                         }
                         testimonials_list.append(data)
                   return make_response(json.dumps(testimonials_list),200)
 
-      #ADD ROLE BASED AUTHENTICATION BELOW
       @token_required(role=[0,1])
       def put(self,user,current_user):
             parser = create_testimonial_status_parser.parse_args()

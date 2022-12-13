@@ -23,6 +23,7 @@ class RegisterUser(Resource):
 
 
 
+# -------------- Login API -------------- #
 create_login_parser = reqparse.RequestParser()
 create_login_parser.add_argument('email')
 create_login_parser.add_argument('password')
@@ -32,17 +33,17 @@ class Login(Resource):
             parser = create_login_parser.parse_args()
             email = parser.get('email',None)
             password = parser.get('password',None)
-
+            
             if(email is not None and password is not None):
                   user = User.query.filter_by(email=email).first()
                   if user is not None:
                         if verify_password(password,user.password):
                               jwt_token = jwt.encode({
                                     'public_id': user.id,
-                                    'role_id' : user.user_detail[0].role_id,
+                                    'role_id' : user.role_id,
                                     'exp' : datetime.utcnow() + timedelta(minutes = 30)
                                     }, app.config['SECRET_KEY'])
-                              return jsonify({'jwt_token' : jwt_token, 'role_id' : user.user_detail[0].role_id})
+                              return jsonify({'jwt_token' : jwt_token, 'role_id' : user.role_id})
                         else:
                              return make_response(json.dumps("Invalid Password."),400)  
                   else:

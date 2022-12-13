@@ -6,7 +6,6 @@ from flask_security.proxies import _security
 from flask_security.registerable import register_user
 from flask_security.utils import base_render_json, suppress_form_csrf, view_commit
 from flask.typing import ResponseValue
-from jwt_tokens.generate_token import generate_jwt_token
 
 @anonymous_user_required
 def register() -> "ResponseValue":

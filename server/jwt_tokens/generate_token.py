@@ -1,6 +1,7 @@
 import jwt
 from extensions.app import app
 from datetime import datetime,timedelta
+
 def generate_jwt_token(user,role_id=2):
     jwt_token = jwt.encode({
                 'public_id': user.id,

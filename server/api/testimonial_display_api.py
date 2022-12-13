@@ -15,7 +15,7 @@ class DisplayTestimonialsApi(Resource):
                         data = {
                               "feedback" : i.feedback,
                               "timestamp" : str(datetime.strftime(datetime.strptime(i.timestamp[:10],"%Y-%m-%d"),"%d-%m-%Y")),
-                              "name": i.user.user_detail[0].name
+                              "name": i.user.name
                         }
                         testimonials_list.append(data)
                   return make_response(json.dumps(testimonials_list),200)

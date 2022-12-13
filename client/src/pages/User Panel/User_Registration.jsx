@@ -5,8 +5,10 @@ import logo from "./../../assets/logo-black.png";
 import { Button, TextField } from "@mui/material";
 import validator from 'validator';
 import { useState } from "react";
-import api_url from "../../global_data.js"
+import api_url from "../../utils/global_data.js"
 import jwt_decode from "jwt-decode"
+import validateToken from "../../utils/validateToken";
+var encryptor = require('simple-encryptor')("drfgbjhumuuuukyhghuygjkgt");
 
 function UserRegistration() {
 
@@ -37,75 +39,79 @@ function UserRegistration() {
 
     // Prevent auto refreshing of the page
     e.preventDefault();
+
     if (passwordError) {
       alert("Please keep a check of constraints !!! ");
     }
-    else {
-      // Get and check for token in local storage
-      const jwt_token = localStorage.getItem("jwt_token");
-      if (jwt_token) {
-        alert("You are already logged in.");
-        navigate_to("/view-testimonial-status");
+    else if (validateToken()) {
+      alert("You are already logged in.");
+      const role_id = encryptor.decrypt(localStorage.getItem("role_id"));
+      if (role_id === 0 || role_id === 1) {
+        navigate_to("/view-pending-testimonial-status");
       }
       else {
-        const user = {
-          email: e.target.email.value,
-          password: e.target.password.value,
-          password_confirm: e.target.password_confirm.value,
-          name: e.target.name.value,
-          organisation: e.target.organisation.value,
-          pass_year: e.target.pass_year.value,
-          mobile_no: e.target.mobile_no.value,
-        };
+        navigate_to("/add-testimonial");
+      }
+    }
+    else {
+      const user = {
+        email: e.target.email.value,
+        password: e.target.password.value,
+        password_confirm: e.target.password_confirm.value,
+        name: e.target.name.value,
+        organisation: e.target.organisation.value,
+        pass_year: e.target.pass_year.value,
+        mobile_no: e.target.mobile_no.value,
+      };
 
-        const url = api_url() + "api/register";
-        const init_ob = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-            'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify(user),
-        };
-        const res = await fetch(url, init_ob).catch((e) => {
-          alert("Network Error");
-        });
+      const url = api_url() + "api/register";
+      const init_ob = {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify(user),
+      };
+      const res = await fetch(url, init_ob).catch((e) => {
+        alert("Network Error");
+      });
 
-        if (res && res.ok) {
-          alert("Successfully Registered. \nPlease check your email for confirmation link.");
-          navigate_to("/login");
-        }
-        else {
-          res.json().then((d) => {
-            for (const key in d.response.errors) {
-              var error = d.response.errors[key];
-              break;
-            }
-            alert(error);
-          }).catch((e) => {
-            console.log(e);
-            alert("Something went wrong");
-          })
-        }
+      if (res && res.ok) {
+        alert("Successfully Registered. \nPlease check your email for confirmation link.");
+        navigate_to("/login");
+      }
+      else {
+        res.json().then((d) => {
+          for (const key in d.response.errors) {
+            var error = d.response.errors[key];
+            break;
+          }
+          alert(error);
+        }).catch((e) => {
+          console.log(e);
+          alert("Something went wrong");
+        })
       }
     }
   }
 
 
-  useEffect(() => async () => {
-    const jwt_token = localStorage.getItem('jwt_token');
-    if (jwt_token) {
-      try {
-        var decoded = jwt_decode(jwt_token);
-        console.log("decoded = ", decoded);
+  useEffect(() => () => {
+    if (validateToken()) {
+      const role_id = encryptor.decrypt(localStorage.getItem("role_id"));
+      if (role_id == 0 || role_id == 1) {
+        navigate_to("/view-pending-testimonial-status");
       }
-      catch (error) {
-        console.log(error);
+      else {
+        navigate_to("/add-testimonial");
+      }
+    }
+    else {
+      if(localStorage.getItem("jwt_token")){
         localStorage.removeItem('jwt_token');
-        localStorage.removeItem('role_id')
-        navigate_to("/");
-        console.log("You are not logged in 07.");
+        localStorage.removeItem('role_id');
       }
     }
   });

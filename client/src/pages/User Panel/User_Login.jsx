@@ -6,8 +6,9 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import logo from "./../../assets/logo-black.png";
 import "./form.css"
-import api_url from "../../global_data.js"
+import api_url from "../../utils/global_data.js"
 import jwt_decode from "jwt-decode"
+import validateToken from "../../utils/validateToken";
 var encryptor = require('simple-encryptor')("drfgbjhumuuuukyhghuygjkgt");
 
 const UserLogin = () => {
@@ -15,10 +16,16 @@ const UserLogin = () => {
 
       const handleLogin = async (e) => {
             e.preventDefault();
-            const jwt_token = localStorage.getItem("jwt_token");
-            if (jwt_token) {
+
+            if (validateToken()) {
                   alert("You are already logged in.");
-                  navigate_to("/add-testimonial")
+                  const role_id = encryptor.decrypt(localStorage.getItem("role_id"));
+                  if (role_id === 0 || role_id === 1) {
+                        navigate_to("/view-pending-testimonial-status");
+                  }
+                  else {
+                        navigate_to("/add-testimonial");
+                  }
             } else {
                   const user = {
                         email: e.target.email.value,
@@ -35,7 +42,7 @@ const UserLogin = () => {
                         body: JSON.stringify(user),
                   };
 
-                  const res = await fetch(url, init_ob).catch((e)=>{
+                  const res = await fetch(url, init_ob).catch((e) => {
                         alert("Network Error");
                   });
 
@@ -53,64 +60,79 @@ const UserLogin = () => {
                         }
                   }
                   else {
-                        res.json().then((d)=>{
+                        res.json().then((d) => {
                               alert(d);
-                        }).catch(()=>{
+                        }).catch(() => {
                               alert("Something went wrong.");
                         })
                   }
             }
       };
 
-      useEffect(() => async () => {
-            const jwt_token = localStorage.getItem('jwt_token')
-            if (jwt_token) {
-                  try {
-                        var decoded = jwt_decode(jwt_token);
-                        console.log("decoded = ", decoded);
-                        const role_id = encryptor.decrypt(localStorage.getItem('role_id'))
-                        let url;
-                        if (role_id === 0 || role_id === 1) {
-                              url = api_url() + "api/adminValidation";
-                        }
-                        else {
-                              url = api_url() + "api/userValidation";
-                        }
-                        const init_ob = {
-                              method: "GET",
-                              mode: "cors",
-                              headers: {
-                                    "jwt_token": jwt_token,
-                                    'Access-Control-Allow-Origin': '*'
-                              },
-                        };
-                        console.log("first")
-                        const res1 = await fetch(url, init_ob);
-                        if (res1 && res1.ok) {
-                              console.log("Previous Login Success01")
-                              console.log(role_id)
-                              if (role_id === 0 || role_id === 1) {
-                                    navigate_to("/view-pending-testimonial-status");
-                              }
-                              else {
-                                    navigate_to("/add-testimonial");
-                              }
-                        }
-                        else {
-                              localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
-                              navigate_to("/")
-                              console.log("You are not logged in03.")
-                        }
+      useEffect(() => () => {
+            if (validateToken()) {
+                  const role_id = encryptor.decrypt(localStorage.getItem("role_id"));
+                  if (role_id === 0 || role_id === 1) {
+                        navigate_to("/view-pending-testimonial-status");
                   }
-                  catch (error) {
-                        console.log(error);
-                        localStorage.removeItem('jwt_token');
-                        localStorage.removeItem('role_id')
-                        navigate_to("/");
-                        console.log("You are not logged in 07.");
+                  else {
+                        navigate_to("/add-testimonial");
                   }
             }
-      }, []);
+            else {
+                  if (localStorage.getItem("jwt_token")) {
+                        localStorage.removeItem('jwt_token');
+                        localStorage.removeItem('role_id')
+                  }
+            }
+            // const jwt_token = localStorage.getItem('jwt_token')
+            // if (jwt_token) {
+            //       try {
+            //             var decoded = jwt_decode(jwt_token);
+            //             console.log("decoded = ", decoded);
+            //             const role_id = encryptor.decrypt(localStorage.getItem('role_id'))
+            //             let url;
+            //             if (role_id === 0 || role_id === 1) {
+            //                   url = api_url() + "api/adminValidation";
+            //             }
+            //             else {
+            //                   url = api_url() + "api/userValidation";
+            //             }
+            //             const init_ob = {
+            //                   method: "GET",
+            //                   mode: "cors",
+            //                   headers: {
+            //                         "jwt_token": jwt_token,
+            //                         'Access-Control-Allow-Origin': '*'
+            //                   },
+            //             };
+            //             console.log("first")
+            //             const res1 = await fetch(url, init_ob);
+            //             if (res1 && res1.ok) {
+            //                   console.log("Previous Login Success01")
+            //                   console.log(role_id)
+            //                   if (role_id === 0 || role_id === 1) {
+            //                         navigate_to("/view-pending-testimonial-status");
+            //                   }
+            //                   else {
+            //                         navigate_to("/add-testimonial");
+            //                   }
+            //             }
+            //             else {
+            //                   localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
+            //                   navigate_to("/")
+            //                   console.log("You are not logged in03.")
+            //             }
+            //       }
+            //       catch (error) {
+            //             console.log(error);
+            //             localStorage.removeItem('jwt_token');
+            //             localStorage.removeItem('role_id')
+            //             navigate_to("/");
+            //             console.log("You are not logged in 07.");
+            //       }
+            // }
+      });
 
       return (
             <div className="form_page_wrapper">

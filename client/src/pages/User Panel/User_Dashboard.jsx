@@ -2,84 +2,65 @@ import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api_url from "../../global_data.js"
-
-// function createData(sl_no, timestamp, feedback, validation_status) {
-//   return { sl_no, timestamp, feedback, validation_status };
-// }
+import api_url from "../../utils/global_data.js"
+import jwt_decode from "jwt-decode"
+import validateToken from "../../utils/validateToken.js";
 
 
 const UserDashboard = () => {
   const [row, setRow] = useState([]);
-  // var rows = [];
   let navigate_to = useNavigate();
 
   const [dashboardData, setDashboardData] = React.useState(false);
 
   const handleLogout = async (event) => {
     event.preventDefault();
-      localStorage.removeItem('jwt_token'); 
-      localStorage.removeItem('role_id')
-      navigate_to("/testimonials");
-      console.log("Succesfully Logged Out")
+    alert("You are logged out.");
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('role_id')
+    navigate_to("/testimonials");
   }
 
   const getData = async () => {
-    console.log("randobhj");
-    const jwt_token = localStorage.getItem('jwt_token')
-    if (jwt_token) {
-      const url = api_url()+"api/userValidation";
-      const init_ob = {
+
+    if (validateToken()) {
+      const url = api_url() + "api/get/userDashboard";
+      const init_obj = {
         method: "GET",
         mode: "cors",
         headers: {
-          "jwt_token": jwt_token,
+          "jwt_token": localStorage.getItem("jwt_token"),
           'Access-Control-Allow-Origin': '*'
         },
       };
-      const res1 = await fetch(url, init_ob);
-      if (res1 && res1.ok) {
-        res1.json().catch(() => {
-          navigate_to("/")
-          console.log("You are not logged in 07.")
-          localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
-          // Add navigate option
-        }
-        )
-        const url1 = api_url()+"api/get/userDashboard";
-        const init_ob1 = {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "jwt_token": jwt_token,
-            'Access-Control-Allow-Origin': '*'
-          },
-        };
-        const res2 = await fetch(url1, init_ob1);
-        res2.json().then((d) => {
-
+      const res = await fetch(url, init_obj).catch(() => {
+        alert("Network Error");
+      });
+      if (res && res.ok) {
+        res.json().then((d) => {
           setRow(d);
-          console.log(row);
-          setDashboardData(true);
+          if (d.length) {
+            setDashboardData(true);
+          }
+        }).catch((e) => {
+          alert("Something went wrong");
         })
-        /*
-                fetch(url1, init_ob1)
-                  .then(response => { return (response.json()) })
-                  .then((data) => {
-                    setRow(data);
-                    console.log(data);
-                    setDashboardData(true);
-                  })
-                  */
       }
       else {
-        navigate_to("/")
-        console.log("You are not logged in 02.")
+        alert("You are not authorised to view this page.");
+        navigate_to("/view-pending-testimonial-status");
       }
     }
     else {
-      navigate_to("/")
-      console.log("You are not logged in05.")
+      if (localStorage.getItem("jwt_token")) {
+        alert("Session time out.")
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('role_id');
+      }
+      else {
+        alert("You must login to view this page.");
+      }
+      navigate_to("/login");
     }
   }
   useEffect(() => {

@@ -2,27 +2,29 @@ import { Button, TextareaAutosize } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "./../../assets/logo-black.png";
-import api_url  from "../../global_data.js"
+import api_url from "../../utils/global_data.js"
 import jwt_decode from "jwt-decode"
+import validateToken from "../../utils/validateToken.js";
+
+
 const FeedbackEntry = () => {
 
   let navigate_to = useNavigate();
 
   const handleFeeedbackEntry = async (e) => {
     e.preventDefault();
-    const jwt_token = localStorage.getItem('jwt_token')
-    if (jwt_token) {
+    if (validateToken()) {
       const feedback_details = {
         feedback: e.target.feedback.value,
         validation_status: false
       };
-      const url = api_url()+"api/addUserTestimonial";
+      const url = api_url() + "api/addUserTestimonial";
       const init_ob = {
         method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          "jwt_token": jwt_token
+          "jwt_token": localStorage.getItem('jwt_token')
         },
         body: JSON.stringify(feedback_details),
       };
@@ -32,6 +34,16 @@ const FeedbackEntry = () => {
         navigate_to("/view-testimonial-status")
       }
       else {
+        if (localStorage.getItem("jwt_token")) {
+          alert("Session time out.");
+          localStorage.removeItem('jwt_token');
+          localStorage.removeItem('role_id');
+          navigate_to("/login");
+        }
+        else {
+          alert("You must login to view this page.");
+          navigate_to("/login");
+        }
 
       }
     }
@@ -39,38 +51,27 @@ const FeedbackEntry = () => {
 
   const handleLogout = async (event) => {
     event.preventDefault();
-    const jwt_token = localStorage.getItem('jwt_token')
+    const jwt_token = localStorage.getItem('jwt_token');
     if (jwt_token) {
-      localStorage.removeItem('jwt_token'); 
-      localStorage.removeItem('role_id')
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('role_id');
       navigate_to("/testimonials");
-      console.log("Succesfully Logged Out");
-    }
-    else {
-      console.log("You are not logged in 01.");
     }
   }
-  useEffect(() => async () => {
-    const jwt_token = localStorage.getItem('jwt_token')
-    if (jwt_token) {
-
-      try{
-        var decoded = jwt_decode(jwt_token);
-        console.log("decoded = ",decoded);
+  useEffect(() => () => {
+    if (! validateToken()) {
+      if (localStorage.getItem("jwt_token")) {
+        alert("Session time out.");
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('role_id');
       }
-      catch(error){
-        console.log(error);
-        localStorage.removeItem('jwt_token'); 
-        localStorage.removeItem('role_id')
-        navigate_to("/");
-        console.log("You are not logged in 07.");
+      else{
+        alert("You must login to view this page.");
       }
+      navigate_to("/login");
     }
-    else {
-      navigate_to("/")
-      console.log("You are not logged in05.")
-    }
-  }, []);
+  });
+  
   return (
     <>
       <br /><br /><br />

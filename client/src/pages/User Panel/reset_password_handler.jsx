@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import logo from "./../../assets/logo-black.png";
 import "./form.css"
-import api_url from "../../global_data.js"
+import api_url from "../../utils/global_data.js"
 import jwt_decode from "jwt-decode"
 var encryptor = require('simple-encryptor')("drfgbjhumuuuukyhghuygjkgt");
 
@@ -17,9 +17,9 @@ const ResetPasswordHandler = () => {
 
     const style = {
         inputProps: {
-          style: { textAlign: "left" },
+            style: { textAlign: "left" },
         }
-      }
+    }
 
     const [passwordError, setPasswordError] = useState(null);
 
@@ -37,10 +37,10 @@ const ResetPasswordHandler = () => {
 
     const ResetPassword_handler = async (e) => {
         e.preventDefault();
-        if(passwordError){
-            alert("Please keep a check of constraints !!! ");  
+        if (passwordError) {
+            alert("Please keep a check of constraints !!! ");
         }
-        else{
+        else {
             const user = {
                 "password": e.target.password.value,
                 "password_confirm": e.target.password_confirm.value
@@ -57,11 +57,11 @@ const ResetPasswordHandler = () => {
                 },
                 body: JSON.stringify(user),
             };
-    
+
             const res = await fetch(url, init_ob).catch(() => {
                 alert("Network Error");
             });
-    
+
             if (res && res.ok) {
                 alert("Password reset successfully.");
                 navigate_to("/login");

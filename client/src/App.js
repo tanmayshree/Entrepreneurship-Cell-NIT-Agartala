@@ -89,7 +89,6 @@ function App() {
               <Route path="/login" exact element={<UserLogin />} />
               <Route path="/add-testimonial" exact element={<FeedbackEntry />} />
               <Route path="/view-testimonial-status" exact element={<UserDashboard />} />
-              {/* <Route path="/view-pending-testimonial-status" exact element={<AdminTestimonialManagement />} /> */}
               <Route path="/view-pending-testimonial-status" exact element={<AdminPage />} />
               <Route path="/confirm" exact element={<ConfirmEmail />} />
               <Route path="/send_reset_instruction" exact element={<ResetPassword />} />

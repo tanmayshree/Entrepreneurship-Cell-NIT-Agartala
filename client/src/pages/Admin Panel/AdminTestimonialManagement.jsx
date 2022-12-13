@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./../User Panel/form.css";
-import api_url from "../../global_data.js"
+import api_url from "../../utils/global_data.js"
+import validateToken from "../../utils/validateToken";
 
 const AdminTestimonialManagement = () => {
       const [row, setRow] = useState([]);
@@ -17,120 +18,103 @@ const AdminTestimonialManagement = () => {
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('role_id')
             navigate_to("/testimonials");
-            console.log("Succesfully Logged Out")
       }
 
       const handleStatusUpdate = async (event, id, validation_status) => {
-            // event.preventDefault();
-            console.log(id)
-            const jwt_token = localStorage.getItem('jwt_token')
-            if (jwt_token) {
-                  const url = api_url() + "api/adminValidation";
-                  const init_ob = {
-                        method: "GET",
+            if (validateToken()) {
+
+                  const updateDetails = {
+                        "id": id,
+                        "validation_status": validation_status
+                  }
+                  const url = api_url() + "api/updateTestimonialValidationStatus";
+                  const init_obj = {
+                        method: "PUT",
                         mode: "cors",
                         headers: {
-                              "jwt_token": jwt_token,
+                              "Content-Type": "application/json",
+                              "jwt_token": localStorage.getItem("jwt_token"),
+                              // "id": id,
+                              // "validation_status": validation_status,
                               'Access-Control-Allow-Origin': '*'
                         },
+                        body: JSON.stringify(updateDetails),
                   };
-                  const res1 = await fetch(url, init_ob);
-                  if (res1 && res1.ok) {
-                        res1.json().catch(() => {
-                              navigate_to("/")
-                              console.log("You are not logged in 07.")
-                              localStorage.removeItem('jwt_token');
-                              localStorage.removeItem('role_id');
-                              // Add navigate option
-                        }
-                        )
-                        const updateDetails = {
-                              "id": id,
-                              "validation_status": validation_status
-                        }
-                        const url1 = api_url() + "api/updateTestimonialValidationStatus";
-                        const init_ob1 = {
-                              method: "PUT",
-                              mode: "cors",
-                              headers: {
-                                    "Content-Type": "application/json",
-                                    "jwt_token": jwt_token,
-                                    "id": id,
-                                    "validation_status": validation_status,
-                                    'Access-Control-Allow-Origin': '*'
-                              },
-                              body: JSON.stringify(updateDetails),
-                        };
-                        const res2 = await fetch(url1, init_ob1);
-                        res2.json().then(() => {
+                  const res = await fetch(url, init_obj);
+                  if (res && res.ok) {
+                        res.json().then(() => {
                               navigate_to("/view-pending-testimonial-status");
                               if (validation_status === 1) alert("Feedback Approved.");
                               else if (validation_status === 2) alert("Feedback Rejected.");
                               setDummy({});
+                        }).catch(() => {
+                              alert("Something went wrong.");
                         })
-                        window.location.reload(true);
                   }
-                  else {
-                        navigate_to("/")
+
+                  window.location.reload(true);
+            }
+            else {
+                  if (localStorage.getItem("jwt_token")) {
+                        alert("Session time out.");
                         localStorage.removeItem('jwt_token');
                         localStorage.removeItem('role_id');
-                        console.log("You are not logged in 02.")
                   }
+                  else {
+                        alert("You must login to view this page.");
+                  }
+                  navigate_to("/login");
             }
+
       }
 
 
       const getData = async () => {
-            console.log("aaaaaaaaaaaaarandobhj");
-            const jwt_token = localStorage.getItem('jwt_token')
-            if (jwt_token) {
-                  const url = api_url() + "api/adminValidation";
-                  const init_ob = {
+            if (validateToken()) {
+                  const url = api_url() + "api/admin/getPendingTestimonials";
+                  const init_obj = {
                         method: "GET",
                         mode: "cors",
                         headers: {
-                              "jwt_token": jwt_token,
+                              "jwt_token": localStorage.getItem("jwt_token"),
                               'Access-Control-Allow-Origin': '*'
                         },
                   };
-                  const res1 = await fetch(url, init_ob);
-                  if (res1 && res1.ok) {
-                        res1.json().catch(() => {
-                              navigate_to("/")
-                              console.log("You are not logged in 07.")
-                              localStorage.removeItem('jwt_token'); localStorage.removeItem('role_id')
-                              // Add navigate option
-                        }
-                        )
-                        const url1 = api_url() + "api/admin/getPendingTestimonials";
-                        const init_ob1 = {
-                              method: "GET",
-                              mode: "cors",
-                              headers: {
-                                    "jwt_token": jwt_token,
-                                    'Access-Control-Allow-Origin': '*'
-                              },
-                        };
-                        const res2 = await fetch(url1, init_ob1);
-                        res2.json().then((d) => {
+                  const res = await fetch(url, init_obj).catch(() => {
+                        alert("Network Error");
 
+                  });
+                  if (res && res.ok) {
+                        res.json().then((d) => {
                               setRow(d);
-                              console.log(row);
-                              setDashboardData(true);
+                              if (d.length) {
+                                    setDashboardData(true);
+                              }
+                        }).catch((e) => {
+                              alert("Something went wrong");
                         })
                   }
                   else {
-                        navigate_to("/")
-                        console.log("You are not logged in 02.")
+                        alert("You are not authorised to view this page.");
+                        navigate_to("/view-testimonial-status");
                   }
+
             }
             else {
-                  navigate_to("/")
-                  console.log("You are not logged in05.")
+                  if (localStorage.getItem("jwt_token")) {
+                        alert("Session time out.")
+                        localStorage.removeItem('jwt_token');
+                        localStorage.removeItem('role_id');
+                  }
+                  else {
+                        alert("You must login to view this page.");
+                  }
+                  navigate_to("/login");
             }
       }
+
       useEffect(() => {
-            getData()
+            getData();
       }, []);
 
       if (dashboardData) {
@@ -185,6 +169,8 @@ const AdminTestimonialManagement = () => {
             else {
                   return (
                         <div className="dashboard_wrapper">
+                              <Button type="submit" color="warning" variant="contained" onClick={handleLogout}>Logout</Button>&nbsp;&nbsp;
+                              <br /><br /><br />
                               <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
 
@@ -222,6 +208,8 @@ const AdminTestimonialManagement = () => {
       else
             return (
                   <div className="dashboard_wrapper">
+                        <Button type="submit" color="warning" variant="contained" onClick={handleLogout}>Logout</Button>&nbsp;&nbsp;
+                        <br /><br /><br />
                         <TableContainer component={Paper}>
                               <Table sx={{ minWidth: 650 }} aria-label="simple table">
 
